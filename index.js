@@ -1,6 +1,6 @@
 const express = require('express');
 const fileUpload = require('express-fileupload');
-const PDF2JSON = require('pdf2json');
+const PDFParser = require('pdf2json');
 
 const app = express();
 
@@ -11,14 +11,22 @@ app.post('/upload', (req, res) => {
         return res.status(400).send('No file uploaded.');
     }
 
-    const pdfParser = new PDF2JSON();
+    const pdfParser = new PDFParser();
+    let outputText = '';
 
-    pdfParser.on('pdfParser_dataReady', pdfData => {
-        const text = pdfData.formImage.Pages.map(page =>
-            page.Texts.map(t => t.R[0].T).join(' ')
-        ).join(' ');
+    pdfParser.on("pdfParser_dataError", errData => console.error(errData.parserError));
+    pdfParser.on("pdfParser_dataReady", pdfData => {
+        if (pdfData.formImage && pdfData.formImage.Pages) {
+            pdfData.formImage.Pages.forEach(page => {
+                if (page.Texts) {
+                    page.Texts.forEach(text => {
+                        outputText += decodeURIComponent(text.R[0].T) + ' ';
+                    });
+                }
+            });
+        }
 
-        res.json({ text });
+        res.json({ text: outputText });
     });
 
     pdfParser.parseBuffer(req.files.pdf.data);
