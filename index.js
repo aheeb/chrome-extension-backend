@@ -1,6 +1,6 @@
 const express = require('express');
 const fileUpload = require('express-fileupload');
-const PDFParser = require('pdf2json');
+const pdfParse = require('pdf-parse');
 
 const app = express();
 
@@ -11,25 +11,15 @@ app.post('/upload', (req, res) => {
         return res.status(400).send('No file uploaded.');
     }
 
-    const pdfParser = new PDFParser();
-    let outputText = '';
+    let dataBuffer = req.files.pdf.data;
 
-    pdfParser.on("pdfParser_dataError", errData => console.error(errData.parserError));
-    pdfParser.on("pdfParser_dataReady", pdfData => {
-        if (pdfData.formImage && pdfData.formImage.Pages) {
-            pdfData.formImage.Pages.forEach(page => {
-                if (page.Texts) {
-                    page.Texts.forEach(text => {
-                        outputText += decodeURIComponent(text.R[0].T) + ' ';
-                    });
-                }
-            });
-        }
-
-        res.json({ text: outputText });
+    pdfParse(dataBuffer).then(function (data) {
+        // data.text contains the extracted text from the PDF
+        res.json({ text: data.text });
+    }).catch(error => {
+        console.error('Error:', error);
+        res.status(500).send('Error processing PDF');
     });
-
-    pdfParser.parseBuffer(req.files.pdf.data);
 });
 
 const PORT = process.env.PORT || 3000;
