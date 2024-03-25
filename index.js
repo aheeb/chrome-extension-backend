@@ -6,6 +6,7 @@ const bcrypt = require('bcrypt');
 const session = require('express-session');
 const dotenv = require('dotenv');
 const app = express();
+require('dotenv').config();
 
 app.use(fileUpload());
 
