@@ -94,7 +94,6 @@ app.post('/login', async (req, res) => {
 
 app.post('/save-response', async (req, res) => {
     const { userId, personality } = req.body;
-    console.log('Personality + ' + personality + 'userId' + userId);
     if (!userId || !personality) {
         return res.status(400).json({ message: "Missing data" });
     }
@@ -110,6 +109,25 @@ app.post('/save-response', async (req, res) => {
         res.status(500).json({ status: 'error', message: 'Error saving personality' });
     }
 });
+
+app.get('/get-personalities', async (req, res) => {
+    const userId = req.session.user;
+    if (!userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    try {
+        const result = await pool.query(
+            'SELECT * FROM personalities WHERE user_id = $1',
+            [userId]
+        );
+        res.json({ personalities: result.rows });
+    } catch (error) {
+        console.error('Database error:', error);
+        res.status(500).json({ message: 'Error getting personalities' });
+    }
+}
+);
 
 
 
