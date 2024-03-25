@@ -94,7 +94,7 @@ app.post('/login', async (req, res) => {
 
 app.post('/save-response', async (req, res) => {
     const { userId, personality } = req.body;
-    console.log(personality, userId);
+    console.log('Personality + ' + personality + 'userId' + userId);
     if (!userId || !personality) {
         return res.status(400).json({ message: "Missing data" });
     }
