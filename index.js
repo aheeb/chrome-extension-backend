@@ -92,6 +92,27 @@ app.post('/login', async (req, res) => {
 });
 
 
+app.post('/save-response', async (req, res) => {
+    const { userId, personality } = req.body;
+
+    if (!userId || !personality) {
+        return res.status(400).json({ message: "Missing data" });
+    }
+
+    try {
+        const result = await pool.query(
+            'INSERT INTO personalities (user_id, personality) VALUES ($1, $2) RETURNING id',
+            [userId, personality]
+        );
+        res.json({ status: 'success', message: 'Personality saved', personalityId: result.rows[0].id });
+    } catch (error) {
+        console.error('Database error:', error);
+        res.status(500).json({ status: 'error', message: 'Error saving personality' });
+    } u
+});
+
+
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
