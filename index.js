@@ -108,7 +108,7 @@ app.post('/save-response', async (req, res) => {
     } catch (error) {
         console.error('Database error:', error);
         res.status(500).json({ status: 'error', message: 'Error saving personality' });
-    } u
+    }
 });
 
 
