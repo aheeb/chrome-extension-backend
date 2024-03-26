@@ -121,7 +121,7 @@ app.get('/get-personalities/:userId', async (req, res) => {
             'SELECT * FROM personalities WHERE user_id = $1',
             [userId]
         );
-        res.json({ personalities: result.rows });
+        res.status(201).json({ personalities: result.rows });
     } catch (error) {
         console.error('Database error:', error);
         res.status(500).json({ message: 'Error getting personalities' });
