@@ -110,8 +110,8 @@ app.post('/save-response', async (req, res) => {
     }
 });
 
-app.get('/get-personalities', async (req, res) => {
-    const userId = req.session.user;
+app.get('/get-personalities/:userId', async (req, res) => {
+    const userId = req.params.userId;
     if (!userId) {
         return res.status(401).json({ message: "Unauthorized" });
     }
